@@ -6,15 +6,26 @@
     <title>Blog</title>
 </head>
 <body>
+    <h1>Announcements</h1>
+    <ul>
+        {%for announcement in announcements%}
+        <li>
+            <a href="{{ url_for('view_announcement', announcement_id=announcement[0])}}">{{ announcement[1] }}</a>
+        </li>
+        {% endfor %}
+    </ul>
     <h1>Blog Posts</h1>
     <ul>
         {% for post in posts %}
             <li>
                 <a href="{{ url_for('view_post', post_id=post[0]) }}">{{ post[1] }}</a>
-                <p>{{ post[2] }}</p>
+                <!-- <p>{{ post[2] }}</p>  -->
             </li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('new_post') }}">Create a new post</a>
+    <a href="{{ url_for('new_announcement') }}">Create a new announcement</a>
+    <p></p>
+    <a href="{{ url_for('new_post')}}">Create a new post</a>
+    
 </body>
 </html>

@@ -34,12 +34,17 @@ def close_connection(exception):
 @app.route("/")
 def index():
     db = get_db()
+    cursor2 = db.execute('SELECT id, announcement, created_at FROM announcements ORDER BY created_at DESC')
     cursor = db.execute('SELECT id, title, content, created_at FROM posts ORDER BY created_at DESC')
     posts = cursor.fetchall()
-    return render_template('index.html', posts=posts)
+    announcements = cursor2.fetchall()
+    print("This is index running")
+    print(announcements)
+    return render_template('index.html', posts=posts, announcements=announcements)
 
 @app.route('/post/<int:post_id>')
 def view_post(post_id):
+    print("You are viewing post")
     db = get_db()
 
     cursor = db.execute('SELECT id, title, content, created_at FROM posts ORDER BY created_at DESC')
@@ -50,8 +55,22 @@ def view_post(post_id):
 
     return render_template('post.html', post=post)
 
-@app.route('/new', methods=['GET', 'POST'])
+@app.route('/announcement/<int:announcement_id>')
+def view_announcement(announcement_id):
+    print("You are viewing announcement")
+    db = get_db()
+
+    cursor = db.execute('SELECT id, announcement, created_at FROM announcements ORDER BY created_at DESC')
+    announcement = cursor.fetchone()
+
+    if not announcement:
+        return 'Announcement not found', 404
+    
+    return render_template('announcement.html', announcement=announcement)
+
+@app.route('/new_post', methods=['GET', 'POST'])
 def new_post():
+    print("new post being run")
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
@@ -65,6 +84,21 @@ def new_post():
         return redirect(url_for('index'))
     return render_template('new_post.html')
 
-#init_db()
+@app.route('/new_announcement', methods=['GET', 'POST'])
+def new_announcement():
+    print("new announcement being run")
+    if request.method == 'POST':
+        announcement = request.form['announcement']
+
+        db = get_db()
+
+        db.execute('INSERT INTO announcements (announcement) VALUES (?)', (announcement,))
+
+        db.commit()
+
+        return redirect(url_for('index'))
+    return render_template('new_announcement.html')
+
+init_db()
 if __name__ == "__main__":
     app.run(debug=True, threaded=False)
